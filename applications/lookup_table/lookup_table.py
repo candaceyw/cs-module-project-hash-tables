@@ -2,15 +2,17 @@
 import math
 import random
 
-# def slowfun_too_slow(x, y):
-#     v = math.pow(x, y)
-#     v = math.factorial(v)
-#     v //= (x + y)
-#     v %= 982451653
-#
-#     return v
+# create dict
+cache = {}
 
-d = {}
+def slowfun_too_slow(x, y):
+    v = math.pow(x, y)
+    v = math.factorial(v)
+    v //= (x + y)
+    v %= 982451653
+
+    return v
+
 
 def slowfun(x, y):
     """
@@ -18,24 +20,22 @@ def slowfun(x, y):
     output, but completes quickly instead of taking ages to run.
     """
     # Your code here
-    v = 0
-    if v not in d:
+    # x and y to key values
+    key = (x, y)
 
-        d[v] = math.pow(x, y)
-        print(v)
+    # check if key is in the dictionary
+    if key in cache:
+        # return the dict key
+        return cache[key]
 
-        d[v] = math.factorial(v)
-        print(v)
+    else:
+        v = math.pow(x, y)
+        v = math.factorial(v)
+        v //= (x + y)
+        v %= 982451653
 
-        d[v] //= (x + y)
-        print(v)
-
-        d[v] %= 982451653
-        print(v)
-
-    return d[v]
-
-
+        cache[key] = v
+        return v
 
 # Do not modify below this line!
 

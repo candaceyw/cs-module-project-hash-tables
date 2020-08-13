@@ -1,7 +1,18 @@
 def word_count(s):
     # Your code here
-    pass
 
+    # Case should be ignored. Output keys must be lowercase.
+    # key order in dict doesn't matter
+    # split the string into words on any whitespace
+    # ignore each of the following chars:
+    # " : ; , . - + = / \ | [ ] { } ( ) * ^ &
+    # if input contains no ignored chars, return empty dict
+
+    word_dict = {}
+
+    # if input contains no ignored chars
+    #     return empty dict
+    #
 
 
 if __name__ == "__main__":
