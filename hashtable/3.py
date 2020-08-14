@@ -10,7 +10,7 @@ class HashTableEntry:
 
 
 # Hash table can't have fewer than this many slots
-MIN_CAPACITY = 8
+MIN_CAPACITY = 12
 
 
 class HashTable:
@@ -20,7 +20,7 @@ class HashTable:
     Implement this.
     """
 
-    def __init__(self, capacity=MIN_CAPACITY):
+    def __init__(self, capacity):
         # Your code here
         self.capacity = capacity
         #
@@ -83,32 +83,20 @@ class HashTable:
         """
         # Your code here
         idx = self.hash_index(key)
-        new_node = HashTableEntry(key, value)
+        # self.bucket[idx] = HashTableEntry(key, value)
 
         # check if index is empty
         if self.bucket[idx] is None:
             # add index into bucket
-            self.bucket[idx] = new_node
+            self.bucket[idx] = HashTableEntry(key, value)
             # item count +=1
             self.item_count += 1
 
-        # if bucket index is not None:
-            # updated the value for an existing key or create a new entry for the key
-        else:
-            current = self.bucket[idx]
-
-            while current.key != key and current.next:
-                current = current.next
-
-            # update keys current value
-            if current.key == key:
-                current.value = value
-
-            # if no key found, new node
-            else:
-                current.next = new_node
-                self.item_count += 1
-
+        if self.bucket[idx] is None:
+            # add index into bucket
+            self.bucket[idx] = HashTableEntry(key, value)
+            # item count +=1
+            self.item_count += 1
 
     def delete(self, key):
         """
@@ -160,23 +148,6 @@ class HashTable:
         """
         # Your code here
 
-        # Make a new array that's DOUBLE the current size
-
-        old_bucket = self.bucket
-
-        self.capacity = new_capacity
-        self.bucket = [None] * new_capacity
-
-        # Go through each linked list in the array
-        for item in old_bucket:
-            if item:
-                currNode = item
-                # Go through each item and rehash it
-                # insert the items into their new location
-
-                while currNode:
-                    self.put(currNode.key, currNode.value)
-                    currNode = currNode.next
 
 
 if __name__ == "__main__":

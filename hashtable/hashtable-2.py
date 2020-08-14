@@ -3,10 +3,10 @@ class HashTableEntry:
     Linked List hash table key/value pair
     """
 
-    def __init__(self, key, value):
+    def __init__(self, key, value, next=None):
         self.key = key
         self.value = value
-        self.next = None
+        self.next = next
 
 
 # Hash table can't have fewer than this many slots
@@ -17,54 +17,59 @@ class HashTable:
     """
     A hash table that with `capacity` buckets
     that accepts string keys
+
     Implement this.
     """
 
     def __init__(self, capacity=MIN_CAPACITY):
         # Your code here
         self.capacity = capacity
-        #
-
-        self.bucket = [None] * capacity
-        self.item_count = 0
+        self.storage = [0] * self.capacity
+        self.itemCount = 0
 
     def get_num_slots(self):
         """
         Return the length of the list you're using to hold the hash
         table data. (Not the number of items stored in the hash table,
         but the number of slots in the main list.)
+
         One of the tests relies on this.
+
         Implement this.
         """
         # Your code here
-        return len(self.bucket)
+        return len(self.storage)
 
     def get_load_factor(self):
         """
         Return the load factor for this hash table.
+
         Implement this.
         """
         # Your code here
-        load = self.item_count / self.capacity
+        load = self.itemCount / self.capacity
         return load
 
     def fnv1(self, key):
         """
         FNV-1 Hash, 64-bit
+
         Implement this, and/or DJB2.
         """
 
         # Your code here
+        pass
 
     def djb2(self, key):
         """
         DJB2 hash, 32-bit
+
         Implement this, and/or FNV-1.
         """
         # Your code here
         hash = 5381
-        for x in key:
-            hash = ((hash << 5) + hash) + ord(x)
+        for c in key:
+            hash = (hash * 33) + ord(c)
         return hash & 0xFFFFFFFF
 
     def hash_index(self, key):
@@ -78,79 +83,109 @@ class HashTable:
     def put(self, key, value):
         """
         Store the value with the given key.
+
         Hash collisions should be handled with Linked List Chaining.
+
         Implement this.
         """
-        # Your code here
-        idx = self.hash_index(key)
-        new_node = HashTableEntry(key, value)
+        # check load factor
+        if self.get_load_factor() > 0.7:
+            self.resize(self.capacity * 2)
 
-        # check if index is empty
-        if self.bucket[idx] is None:
-            # add index into bucket
-            self.bucket[idx] = new_node
-            # item count +=1
-            self.item_count += 1
+        # get index from hash
+        ind = self.hash_index(key)
+        # if self.storage[ind] == 0:
+        # self.storage[ind]= HashTableEntry(key, value)
+        # self.itemCount+= 1
 
-        # if bucket index is not None:
-            # updated the value for an existing key or create a new entry for the key
+        # # if index is empty
+        if self.storage[ind] == 0:
+            # add newNode
+            self.storage[ind] = HashTableEntry(key, value)
+        # else: 'chain' new node to end, or 'overwrite' the existing node
         else:
-            current = self.bucket[idx]
-
-            while current.key != key and current.next:
-                current = current.next
-
-            # update keys current value
-            if current.key == key:
-                current.value = value
-
-            # if no key found, new node
-            else:
-                current.next = new_node
-                self.item_count += 1
-
+            curr = self.storage[ind]
+            while curr.next != None:
+                # overwrite if keys match
+                if curr.key == key:
+                    curr.value = value
+                    self.itemCount += 1
+                    break
+                # if keys dont match, add a new entry
+                else:
+                    curr = curr.next
+                # add new node at the end of linked-list chain
+            curr.next = HashTableEntry(key, value)
+            self.itemCount += 1
 
     def delete(self, key):
         """
         Remove the value stored with the given key.
+
         Print a warning if the key is not found.
+
         Implement this.
         """
         # Your code here
         idx = self.hash_index(key)
-        # if bucket index is not empty
-        if self.bucket[idx] is not None:
-            if self.bucket[idx].key == key:
-                # delete index/ idx = None
-                self.bucket[idx] = None
-                self.item_count -= 1
+        # if self.storage[ind] != 0:
+        #     self.storage[ind]= 0
+        #     self.itemCount-= 1
+        # else:
+        #     print('Warning! That key was not found!')
+
+        # possibilities:
+        # one node,
+        # empty,
+        # there's more than one node
+        curr = self.storage[idx]
+        prev = curr
+        if curr != 0:
+            count = 0
+            while curr.key is not None:
+                if curr.key == key:
+                    # is only node?
+                    if curr.next is None and count == 0:
+                        self.storage[idx] = 0
+                        break
+                    # is first but not the only node
+                    elif curr.next is not None and count == 0:
+                        self.storage[idx] = curr.next
+                        break
+                    # is last node?
+                    elif curr.next is None and count > 0:
+                        prev.next = None
+                        break
+                    # is middle node?
+                    else:
+                        prev.next = curr.next
+                        break
+                else:
+                    count += 1
+                    prev = prev.next
+                    curr = curr.next
         else:
-            print("Key is not found")
+            print('Warning key not found')
 
     def get(self, key):
         """
         Retrieve the value stored with the given key.
+
         Returns None if the key is not found.
+
         Implement this.
         """
         # Your code here
-        idx = self.hash_index(key)
-        # if bucket index is empty, return None
-        if self.bucket[idx] is None:
-            return None
-        else:
-            while self.bucket[idx].key != key and self.bucket[idx].next is not None:
-                self.bucket[idx] = self.bucket[idx].next
-
-            # if bucket is not empty
-            # if self.bucket[idx] is not None:
-            #     # return bucket index value
-            #     return self.bucket[idx]
-
-            if self.bucket[idx].key == key:
-                return self.bucket[idx].value
-            else:
-                return None
+        ind = self.hash_index(key)
+        result = None
+        # if not empty
+        if self.storage[ind] != 0:
+            curr = self.storage[ind]
+            while curr:
+                if curr.key == key:
+                    result = curr.value
+                curr = curr.next
+        return result
 
     def resize(self, new_capacity):
         """
@@ -158,29 +193,26 @@ class HashTable:
         rehashes all key/value pairs.
         Implement this.
         """
-        # Your code here
-
-        # Make a new array that's DOUBLE the current size
-
-        old_bucket = self.bucket
 
         self.capacity = new_capacity
-        self.bucket = [None] * new_capacity
+        old_arr = self.storage
+        new_arr = [0] * new_capacity
 
-        # Go through each linked list in the array
-        for item in old_bucket:
-            if item:
-                currNode = item
-                # Go through each item and rehash it
-                # insert the items into their new location
+        self.storage = new_arr
 
-                while currNode:
-                    self.put(currNode.key, currNode.value)
-                    currNode = currNode.next
+        # loop through old arr, and rehash all items into the new arr
+        # if slot has a next node, then traverse all nodes
+        for idx in range(len(old_arr) - 1):
+            if old_arr[idx] != 0:
+                curr = old_arr[idx]
+                while curr:
+                    idx = self.hash_index(curr.key)
+                    new_arr[idx] = curr
+                    curr = curr.next
 
 
 if __name__ == "__main__":
-    ht = HashTable(12)
+    ht = HashTable(8)
 
     ht.put("line_1", "'Twas brillig, and the slithy toves")
     ht.put("line_2", "Did gyre and gimble in the wabe:")
@@ -196,7 +228,6 @@ if __name__ == "__main__":
     ht.put("line_12", "And stood awhile in thought.")
 
     print("")
-
 
     # Test storing beyond capacity
     for i in range(1, 13):

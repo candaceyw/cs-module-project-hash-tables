@@ -1,5 +1,9 @@
 # Your code here
+import math
+import random
 
+# create dict
+cache = {}
 
 def slowfun_too_slow(x, y):
     v = math.pow(x, y)
@@ -9,14 +13,29 @@ def slowfun_too_slow(x, y):
 
     return v
 
+
 def slowfun(x, y):
     """
     Rewrite slowfun_too_slow() in here so that the program produces the same
     output, but completes quickly instead of taking ages to run.
     """
     # Your code here
+    # x and y to key values
+    key = (x, y)
 
+    # check if key is in the dictionary
+    if key in cache:
+        # return the dict key
+        return cache[key]
 
+    else:
+        v = math.pow(x, y)
+        v = math.factorial(v)
+        v //= (x + y)
+        v %= 982451653
+
+        cache[key] = v
+        return v
 
 # Do not modify below this line!
 
