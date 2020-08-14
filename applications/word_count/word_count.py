@@ -1,3 +1,5 @@
+import re
+
 def word_count(s):
     # Your code here
 
@@ -6,14 +8,24 @@ def word_count(s):
     # split the string into words on any whitespace
     # ignore each of the following chars:
     # " : ; , . - + = / \ | [ ] { } ( ) * ^ &
-    # if input contains no ignored chars, return empty dict
+    # if input contains only ignored chars, return empty dict
 
     word_dict = {}
 
-    # if input contains no ignored chars
-    #     return empty dict
-    #
+    # loop through string and split()
+    for word in s.split():
+        # lowercase each word
+        lowercase_word = word.lower()
+        new_word = re.sub('[\"\:\;\,\.\-\+\=\/\\\|\[\]\{\}(\)\*\^\&]', '', lowercase_word)
+        # print(reject)
 
+        if len(new_word ) > 0:
+            if new_word  not in word_dict:
+                word_dict[new_word ] = 1
+            else:
+                word_dict[new_word ] +=1
+
+    return word_dict
 
 if __name__ == "__main__":
     print(word_count(""))
